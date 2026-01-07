@@ -84,13 +84,14 @@ RUN wget https://github.com/facebook/infer/releases/download/v0.17.0/infer-linux
     mv infer-* infer 
 
 # cppcheck (repo/oss version doesn't have `--bug-hunting`)
-RUN wget https://www.cs.virginia.edu/~rm5tx/6888/cppc.tar.gz && \
-    tar -xzf cppc.tar.gz && \
-    rm cppc.tar.gz && \
-    cd cppcheck && \
-    mkdir build && \
-    cd build && \
-    cmake .. && \
-    cmake --build . && \
-    mkdir /usr/local/share/Cppcheck && \
-    cp -r /root/cppcheck/build/bin/* /usr/local/share/Cppcheck
+#RUN wget https://www.cs.virginia.edu/~rm5tx/6888/cppc.tar.gz && \
+#    tar -xzf cppc.tar.gz && \
+#    rm cppc.tar.gz && \
+#    cd cppcheck && \
+#    mkdir build && \
+#    cd build && \
+#    cmake .. && \
+#    cmake --build . && \
+#    mkdir /usr/local/share/Cppcheck && \
+#    cp -r /root/cppcheck/build/bin/* /usr/local/share/Cppcheck
+
