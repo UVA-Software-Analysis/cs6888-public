@@ -1,7 +1,8 @@
 services:
   main:
     platform: linux/amd64
-    build: .
+    image: ghcr.io/uva-software-analysis/cs6888-public:latest
+    # build: .  # Uncomment to build locally instead of using pre-built image
     command: tail -f /dev/null
     volumes: 
       - ./files:/root/files/
