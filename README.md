@@ -10,10 +10,10 @@ You can use the pre-built Docker image from GitHub Container Registry (ghcr.io),
 
 ```bash
 # Pull the latest image
-docker pull ghcr.io/UVA-Software-Analysis/cs6888-public:latest
+docker pull ghcr.io/uva-software-analysis/cs6888-public:latest
 
 # Run the container interactively
-docker run -it --rm -v $(pwd)/files:/root/files ghcr.io/UVA-Software-Analysis/cs6888-public:latest bash
+docker run -it --rm -v $(pwd)/files:/root/files ghcr.io/uva-software-analysis/cs6888-public:latest bash
 ```
 
 ### Using Docker Compose with Pre-built Image
@@ -23,7 +23,7 @@ You can also use docker-compose. First, update the `docker-compose.yml` to use t
 ```yaml
 services:
   main:
-    image: ghcr.io/UVA-Software-Analysis/cs6888-public:latest
+    image: ghcr.io/uva-software-analysis/cs6888-public:latest
     volumes:
       - ./files:/root/files
     stdin_open: true
