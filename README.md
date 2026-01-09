@@ -29,8 +29,7 @@ If you prefer to build the image yourself or need to make modifications, edit `d
 Then run:
 
 ```bash
-cd cs6888-public
-docker-compose up --build main
+docker-compose up --build main -d
 ```
 
 Building may take 5-30 minutes depending on your hardware.
