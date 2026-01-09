@@ -79,7 +79,7 @@ RUN git clone git://repo.or.cz/tinycc.git && \
 # HW4 
 # infer (versions >=1 require newer glibc that isn't compatible with building tcc) 
 RUN wget https://github.com/facebook/infer/releases/download/v0.17.0/infer-linux64-v0.17.0.tar.xz && \
-    tar -xf infer-linux64-v*.tar.xz && \
+    tar -xvf infer-linux64-v*.tar.xz && \
     rm infer-linux64-v*.tar.xz && \ 
     mv infer-* infer 
 
