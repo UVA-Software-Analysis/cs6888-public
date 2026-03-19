@@ -1,4 +1,4 @@
-FROM ubuntu:18.04
+FROM ubuntu:24.04
 
 # Set the work directory 
 WORKDIR /root
@@ -40,7 +40,7 @@ RUN apt-get update && \
     afl-cov \
     lcov \
     gcc \
-    cppcheck 
+    # cppcheck 
 
 # HW1
 
@@ -87,7 +87,7 @@ RUN wget https://github.com/facebook/infer/releases/download/v0.17.0/infer-linux
 RUN apt-get update && apt-get install -y libz3-dev && \
     git clone https://github.com/danmar/cppcheck.git && \
     cd cppcheck && \
-    git checkout 2.7 && \
+    # git checkout 2.7 && \
     mkdir build && \
     cd build && \
     cmake -DUSE_Z3=ON .. && \
