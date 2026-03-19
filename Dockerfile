@@ -1,4 +1,4 @@
-FROM ubuntu:24.04
+FROM ubuntu:18.04
 
 # Set the work directory 
 WORKDIR /root
@@ -36,9 +36,11 @@ RUN dpkg-reconfigure locales
 # CS6888 General 
 RUN apt-get update && \
     apt-get install -y \
-    afl++ \
+    afl \
+    afl-cov \
     lcov \
-    gcc
+    gcc \
+    cppcheck 
 
 # HW1
 
@@ -51,16 +53,16 @@ RUN apt-get update && \
 #   echo performance | tee cpu*/cpufreq/scaling_governor
 ENV AFL_I_DONT_CARE_ABOUT_MISSING_CRASHES=1 \
     AFL_SKIP_CPUFREQ=1 \
-    CC=afl-cc \
-    CXX=afl-c++
+    CC=afl-gcc \
+    CXX=afl-g++
 
 ### tcc
 RUN git clone git://repo.or.cz/tinycc.git && \
     cd tinycc && \
     git checkout d348a9a51d32cece842b7885d27a411436d7887b && \
     ./configure --prefix=/root/tcc && \
-    sed -i '/bcheck/d' lib/Makefile && \
-    make CC=afl-cc && \
+    make CC=afl-gcc && \
+    #make test && \
     make install && \
     cd .. && \
     rm -r tinycc
@@ -70,27 +72,25 @@ RUN git clone git://repo.or.cz/tinycc.git && \
     cd tinycc && \
     git checkout d348a9a51d32cece842b7885d27a411436d7887b && \
     ./configure --prefix=/root/tcc-cov --extra-cflags="-fprofile-arcs -ftest-coverage" --extra-ldflags="-coverage" && \
-    sed -i '/bcheck/d' lib/Makefile && \
-    make CC=afl-cc && \
+    make CC=afl-gcc && \
+    #make test && \ 
     make install 
 
 # HW4 
 # infer (versions >=1 require newer glibc that isn't compatible with building tcc) 
-# Create symlink for libtinfo.so.5 (infer's bundled clang needs it, but Ubuntu 24.04 only has libtinfo.so.6)
-RUN ln -s /lib/x86_64-linux-gnu/libtinfo.so.6 /lib/x86_64-linux-gnu/libtinfo.so.5 && \
-    wget https://github.com/facebook/infer/releases/download/v0.17.0/infer-linux64-v0.17.0.tar.xz && \
+RUN wget https://github.com/facebook/infer/releases/download/v0.17.0/infer-linux64-v0.17.0.tar.xz && \
     tar -xvf infer-linux64-v*.tar.xz && \
     rm infer-linux64-v*.tar.xz && \ 
     mv infer-* infer 
 
-# cppcheck (build from source with Z3 support for deeper analysis)
-# Use --check-level=exhaustive for thorough analysis (replaces old --bug-hunting)
-RUN apt-get update && apt-get install -y libz3-dev && \
-    git clone https://github.com/danmar/cppcheck.git && \
-    cd cppcheck && \
-    mkdir build && \
-    cd build && \
-    cmake -DUSE_Z3=ON .. && \
-    cmake --build . -j4 && \
-    mkdir -p /usr/local/share/Cppcheck && \
-    cp -r /root/cppcheck/build/bin/* /usr/local/share/Cppcheck
+# cppcheck (repo/oss version doesn't have `--bug-hunting`)
+# RUN wget https://www.cs.virginia.edu/~rm5tx/6888/cppc.tar.gz && \
+#    tar -xzf cppc.tar.gz && \
+#    rm cppc.tar.gz && \
+#    cd cppcheck && \
+#    mkdir build && \
+#    cd build && \
+#    cmake .. && \
+#    cmake --build . && \
+#    mkdir /usr/local/share/Cppcheck && \
+#    cp -r /root/cppcheck/build/bin/* /usr/local/share/Cppcheck
