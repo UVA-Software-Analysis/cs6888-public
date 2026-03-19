@@ -83,14 +83,14 @@ RUN wget https://github.com/facebook/infer/releases/download/v0.17.0/infer-linux
     rm infer-linux64-v*.tar.xz && \ 
     mv infer-* infer 
 
-# cppcheck (repo/oss version doesn't have `--bug-hunting`)
-# RUN wget https://www.cs.virginia.edu/~rm5tx/6888/cppc.tar.gz && \
-#    tar -xzf cppc.tar.gz && \
-#    rm cppc.tar.gz && \
-#    cd cppcheck && \
-#    mkdir build && \
-#    cd build && \
-#    cmake .. && \
-#    cmake --build . && \
-#    mkdir /usr/local/share/Cppcheck && \
-#    cp -r /root/cppcheck/build/bin/* /usr/local/share/Cppcheck
+# cppcheck (build from source for `--bug-hunting` support, requires Z3)
+RUN apt-get update && apt-get install -y libz3-dev && \
+    git clone https://github.com/danmar/cppcheck.git && \
+    cd cppcheck && \
+    git checkout 2.7 && \
+    mkdir build && \
+    cd build && \
+    cmake -DUSE_Z3=ON .. && \
+    cmake --build . && \
+    mkdir -p /usr/local/share/Cppcheck && \
+    cp -r /root/cppcheck/build/bin/* /usr/local/share/Cppcheck
