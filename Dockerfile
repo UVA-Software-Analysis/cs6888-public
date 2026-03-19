@@ -36,11 +36,9 @@ RUN dpkg-reconfigure locales
 # CS6888 General 
 RUN apt-get update && \
     apt-get install -y \
-    afl \
-    afl-cov \
+    afl++ \
     lcov \
-    gcc \
-    # cppcheck 
+    gcc
 
 # HW1
 
@@ -53,16 +51,16 @@ RUN apt-get update && \
 #   echo performance | tee cpu*/cpufreq/scaling_governor
 ENV AFL_I_DONT_CARE_ABOUT_MISSING_CRASHES=1 \
     AFL_SKIP_CPUFREQ=1 \
-    CC=afl-gcc \
-    CXX=afl-g++
+    CC=afl-cc \
+    CXX=afl-c++
 
 ### tcc
 RUN git clone git://repo.or.cz/tinycc.git && \
     cd tinycc && \
     git checkout d348a9a51d32cece842b7885d27a411436d7887b && \
     ./configure --prefix=/root/tcc && \
-    make CC=afl-gcc && \
-    #make test && \
+    sed -i '/bcheck/d' lib/Makefile && \
+    make CC=afl-cc && \
     make install && \
     cd .. && \
     rm -r tinycc
@@ -72,25 +70,27 @@ RUN git clone git://repo.or.cz/tinycc.git && \
     cd tinycc && \
     git checkout d348a9a51d32cece842b7885d27a411436d7887b && \
     ./configure --prefix=/root/tcc-cov --extra-cflags="-fprofile-arcs -ftest-coverage" --extra-ldflags="-coverage" && \
-    make CC=afl-gcc && \
-    #make test && \ 
+    sed -i '/bcheck/d' lib/Makefile && \
+    make CC=afl-cc && \
     make install 
 
 # HW4 
 # infer (versions >=1 require newer glibc that isn't compatible with building tcc) 
-RUN wget https://github.com/facebook/infer/releases/download/v0.17.0/infer-linux64-v0.17.0.tar.xz && \
+# Create symlink for libtinfo.so.5 (infer's bundled clang needs it, but Ubuntu 24.04 only has libtinfo.so.6)
+RUN ln -s /lib/x86_64-linux-gnu/libtinfo.so.6 /lib/x86_64-linux-gnu/libtinfo.so.5 && \
+    wget https://github.com/facebook/infer/releases/download/v0.17.0/infer-linux64-v0.17.0.tar.xz && \
     tar -xvf infer-linux64-v*.tar.xz && \
     rm infer-linux64-v*.tar.xz && \ 
     mv infer-* infer 
 
-# cppcheck (build from source for `--bug-hunting` support, requires Z3)
+# cppcheck (build from source with Z3 support for deeper analysis)
+# Use --check-level=exhaustive for thorough analysis (replaces old --bug-hunting)
 RUN apt-get update && apt-get install -y libz3-dev && \
     git clone https://github.com/danmar/cppcheck.git && \
     cd cppcheck && \
-    # git checkout 2.7 && \
     mkdir build && \
     cd build && \
     cmake -DUSE_Z3=ON .. && \
-    cmake --build . && \
+    cmake --build . -j4 && \
     mkdir -p /usr/local/share/Cppcheck && \
     cp -r /root/cppcheck/build/bin/* /usr/local/share/Cppcheck
